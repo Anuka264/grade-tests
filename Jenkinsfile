@@ -16,7 +16,7 @@ pipeline {
 
         stage('Pull Image') {
             steps {
-                sh "docker image inspect ${RUNNER_IMAGE} || docker pull ${RUNNER_IMAGE}"
+                sh "docker image inspect ${RUNNER_IMAGE} && echo 'Image ready'"
             }
         }
 
@@ -24,12 +24,12 @@ pipeline {
             steps {
                 sh """
                     mkdir -p ${REPORT_DIR}
-                    docker run --rm \\
-                        -v ${WORKSPACE}:/app \\
-                        -v ${REPORT_DIR}:/app/target/surefire-reports \\
-                        -w /app \\
-                        ${RUNNER_IMAGE} \\
-                        mvn test
+                    docker run --rm \
+                        -v jenkins_home:/var/jenkins_home \
+                        -w /var/jenkins_home/workspace/csv302-grade-tests \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        ${RUNNER_IMAGE} \
+                        mvn test -Dsurefire.reportsDirectory=${REPORT_DIR}
                 """
             }
         }
