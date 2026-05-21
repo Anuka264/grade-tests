@@ -43,7 +43,7 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: "surefire-reports/**/*.xml", allowEmptyArchive: true
+            archiveArtifacts artifacts: "**/surefire-reports/*.xml", allowEmptyArchive: true
         }
         success {
             echo 'BUILD PASSED — all tests green.'
