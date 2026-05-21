@@ -1,20 +1,25 @@
 pipeline {
     agent any
+
     environment {
         RUNNER_IMAGE = 'csv302lpu/grade-runner:v1'
         REPORT_DIR   = "${WORKSPACE}/surefire-reports"
     }
+
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+
         stage('Pull Image') {
             steps {
-                sh "docker pull ${RUNNER_IMAGE}"
+                sh "docker image inspect ${RUNNER_IMAGE} || docker pull ${RUNNER_IMAGE}"
             }
         }
+
         stage('Run Tests') {
             steps {
                 sh """
@@ -28,12 +33,14 @@ pipeline {
                 """
             }
         }
+
         stage('Publish Results') {
             steps {
                 junit "${REPORT_DIR}/**/*.xml"
             }
         }
     }
+
     post {
         always {
             archiveArtifacts artifacts: "surefire-reports/**/*.xml", allowEmptyArchive: true
